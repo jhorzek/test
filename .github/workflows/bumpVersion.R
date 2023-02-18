@@ -1,5 +1,5 @@
 library(desc)
-description <- desc::desc()
+description <- desc::desc(file = "../../DESCRIPTION")
 currentVersion <- description$get_version()
 
 message("The current version is ", currentVersion)
