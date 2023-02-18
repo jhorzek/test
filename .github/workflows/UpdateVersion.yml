@@ -29,8 +29,9 @@ jobs:
           echo "::set-output name=new_version::$new_version"
 
       - name: Update DESCRIPTION file
-        run: sed -i "s/Version:.*$/Version: ${{ steps.increment-version.outputs.new_version }}/g" DESCRIPTION
-
+        run: |
+         sed -i "s/Version:.*$/Version: ${{ steps.increment-version.outputs.new_version }}/g" DESCRIPTION
+         
       - name: Commit changes
         run: |
           git config --local user.email "action@github.com"
