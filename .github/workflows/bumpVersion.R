@@ -2,6 +2,8 @@ library(desc)
 description <- desc::desc()
 currentVersion <- description$get_version()
 
+message("The current version is ", currentVersion)
+
 newVersion <- gsub(pattern = "[0-9]+.[0-9].", 
                    replacement = "", 
                    x = currentVersion) |>
@@ -10,6 +12,8 @@ newVersion <- gsub(pattern = "[0-9]+.[0-9].",
 newVersion <- gsub(pattern = "[0-9]$",
                    replacement = newVersion, 
                    x = currentVersion)
+
+message("The new version is ", newVersion)
 
 description$set_version(version = newVersion)
 
