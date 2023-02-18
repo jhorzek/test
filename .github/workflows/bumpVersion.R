@@ -1,3 +1,5 @@
+print("Starting Script")
+print(ls())
 library(desc)
 description <- desc::desc(file = "../../DESCRIPTION")
 currentVersion <- description$get_version()
