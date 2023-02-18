@@ -17,4 +17,4 @@ message("The new version is ", newVersion)
 
 description$set_version(version = newVersion)
 
-description$write()
+description$write(file = "../../DESCRIPTION")
