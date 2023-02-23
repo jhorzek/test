@@ -18,6 +18,7 @@ jobs:
             echo "Branch version_bump already exists. Skipping this job. Please merge the existing branch first."
             exit 1
           fi
+          exit 0
 
       - name: Get current version number
         id: get-version
