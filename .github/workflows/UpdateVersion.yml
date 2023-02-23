@@ -30,7 +30,14 @@ jobs:
           if test -f "$FILE"; then
             echo "$FILE exists."
           fi
-
+          
+      - name: Check if last commit was to merge a pull request from bump_version
+        run: |
+          if git log -1 --pretty=format:%s | grep -qE "bump_version"; then
+            echo "Last commit did change the version. Skipping update"
+            rm bump_version.txt
+          fi
+          
       - name: Get current version number
         id: get-version
         run: |
