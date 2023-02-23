@@ -17,7 +17,8 @@ jobs:
 
       - name: Check if branch version_bump already exists
         run: |
-          if git ls-remote --heads origin | grep -q "refs/heads/version_bump"; then
+          if git show-ref --verify --quiet refs/heads/<version_bump> == 0
+          then
             echo "Branch version_bump already exists. Skipping this job. Please merge the existing branch first."
             echo "BUMP_VERSION=false" >> $GITHUB_ENV
           fi
