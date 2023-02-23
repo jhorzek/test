@@ -47,7 +47,7 @@ jobs:
          
          git commit -m "Bump version number in DESCRIPTION"
          
-         git push
+         git push --set-upstream origin bump_version
 
          # Request merge
          gh pr create -B main -H bump_version --title 'Bump version' --body 'Created by Github action'
