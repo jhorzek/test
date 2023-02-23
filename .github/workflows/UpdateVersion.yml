@@ -21,7 +21,9 @@ jobs:
             echo "Branch version_bump already exists. Skipping this job. Please merge the existing branch first."
             echo "BUMP_VERSION=false" >> $GITHUB_ENV
           fi
-          BUMP_VERSION
+          echo "$BUMP_VERSION"
+          echo "BUMP_VERSION=false" >> $GITHUB_ENV
+          echo "$BUMP_VERSION"
 
       - name: Get current version number
         id: get-version
