@@ -32,7 +32,8 @@ jobs:
         run: |
          sed -i "s/Version:.*$/Version: ${{ steps.increment-version.outputs.new_version }}/g" DESCRIPTION
        
-      - name: Amend previous commit
+      - name: Create pull request
+        # https://stackoverflow.com/questions/68057744/create-pull-request-with-github-action
         run: |
          git config --local user.email "action@github.com"
          git config --local user.name "GitHub Action"
@@ -48,4 +49,6 @@ jobs:
 
          # Request merge
          gh pr create -B main -H bump_version --title 'Bump version' --body 'Created by Github action'
-
+       
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
