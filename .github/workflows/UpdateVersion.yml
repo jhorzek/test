@@ -21,14 +21,13 @@ jobs:
           then
             echo "Branch version_bump already exists. Skipping this job. Please merge the existing branch first."
             echo "BUMP_VERSION=false" >> $GITHUB_ENV
-          fi
-          echo "$BUMP_VERSION"
-          #echo "BUMP_VERSION=false" >> $GITHUB_ENV
-          #echo "$BUMP_VERSION"
+          else:
+            echo "Branch version_bump does not exist. Creating branch"
+          fi          
 
       - name: Get current version number
         id: get-version
-        if: env.BUMP_VERSION == 'true'
+        if: BUMP_VERSION == 'true'
         run: |
           echo "$BUMP_VERSION"
           current_version=$(grep "Version:" DESCRIPTION | sed 's/Version: \([0-9]*\)\.\([0-9]*\)\.\([0-9]*\)/\1.\2.\3/')
@@ -36,7 +35,7 @@ jobs:
 
       - name: Increment version number
         id: increment-version
-        if: env.BUMP_VERSION == 'true'
+        if: BUMP_VERSION == 'true'
         run: |
           current_version=${{ steps.get-version.outputs.version }}
           major=$(echo $current_version | cut -d '.' -f 1)
@@ -46,12 +45,12 @@ jobs:
           echo "::set-output name=new_version::$new_version"
 
       - name: Update DESCRIPTION file
-        if: env.BUMP_VERSION == 'true'
+        if: BUMP_VERSION == 'true'
         run: |
          sed -i "s/Version:.*$/Version: ${{ steps.increment-version.outputs.new_version }}/g" DESCRIPTION
        
       - name: Create pull request
-        if: env.BUMP_VERSION == 'true'
+        if: BUMP_VERSION == 'true'
         # https://stackoverflow.com/questions/68057744/create-pull-request-with-github-action
         run: |
          git config --local user.email "action@github.com"
