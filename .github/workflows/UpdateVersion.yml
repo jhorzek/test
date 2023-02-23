@@ -31,11 +31,19 @@ jobs:
       - name: Update DESCRIPTION file
         run: |
          sed -i "s/Version:.*$/Version: ${{ steps.increment-version.outputs.new_version }}/g" DESCRIPTION
-         
-      - name: Commit changes
+       
+      - name: Amend previous commit
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add DESCRIPTION
-          git commit -m "Bump version number in DESCRIPTION"
-          git push
+         # Get the details of the previous commit
+         PREVIOUS_AUTHOR="$(git show -s --format='%an <%ae>' HEAD~1)"
+         PREVIOUS_MESSAGE="$(git show -s --format='%B' HEAD~1)"
+
+         # Set the author and message of the current commit to be the same as the previous commit
+         git commit --amend --no-edit --author="$PREVIOUS_AUTHOR" -m "$PREVIOUS_MESSAGE"
+
+         # Add the changes to the previous commit
+         git add DESCRIPTION
+
+         # Push the changes to the remote branch
+         git push origin HEAD
+
