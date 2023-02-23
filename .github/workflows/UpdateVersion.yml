@@ -5,9 +5,6 @@ on:
     branches:
       - main
 
-env:
-  BUMP_VERSION: "true"
-
 jobs:
   update-version:
     runs-on: ubuntu-latest
@@ -20,10 +17,13 @@ jobs:
           if git ls-remote --exit-code --heads origin "version_bump"
           then
             echo "Branch version_bump already exists. Skipping this job. Please merge the existing branch first."
-            echo "BUMP_VERSION=false" >> $GITHUB_ENV
+            export BUMP_VERSION=false
+            echo "::set-env name=BUMP_VERSION::$BUMP_VERSION"
           else:
-            echo "Branch version_bump does not exist. Creating branch"
-          fi          
+            export BUMP_VERSION=true
+            echo "::set-env name=BUMP_VERSION::$BUMP_VERSION"
+          fi
+          echo $BUMP_VERSION
 
       - name: Get current version number
         id: get-version
