@@ -27,48 +27,52 @@ jobs:
 
       - name: Get current version number
         id: get-version
-        if: $BUMP_VERSION == 'true'
         run: |
           echo "$BUMP_VERSION"
+          if $BUMP_VERSION == "true"; then
           current_version=$(grep "Version:" DESCRIPTION | sed 's/Version: \([0-9]*\)\.\([0-9]*\)\.\([0-9]*\)/\1.\2.\3/')
           echo "::set-output name=version::$current_version"
+          fi
 
       - name: Increment version number
         id: increment-version
-        if: $BUMP_VERSION == 'true'
         run: |
-          current_version=${{ steps.get-version.outputs.version }}
-          major=$(echo $current_version | cut -d '.' -f 1)
-          minor=$(echo $current_version | cut -d '.' -f 2)
-          patch=$(echo $current_version | cut -d '.' -f 3)
-          new_version="$major.$minor.$((patch+1))"
-          echo "::set-output name=new_version::$new_version"
+          if $BUMP_VERSION == "true"; then
+            current_version=${{ steps.get-version.outputs.version }}
+            major=$(echo $current_version | cut -d '.' -f 1)
+            minor=$(echo $current_version | cut -d '.' -f 2)
+            patch=$(echo $current_version | cut -d '.' -f 3)
+            new_version="$major.$minor.$((patch+1))"
+            echo "::set-output name=new_version::$new_version"
+          fi
 
       - name: Update DESCRIPTION file
-        if: $BUMP_VERSION == 'true'
         run: |
-         sed -i "s/Version:.*$/Version: ${{ steps.increment-version.outputs.new_version }}/g" DESCRIPTION
+         if $BUMP_VERSION == "true"; then
+          sed -i "s/Version:.*$/Version: ${{ steps.increment-version.outputs.new_version }}/g" DESCRIPTION
+         fi
        
       - name: Create pull request
-        if: $BUMP_VERSION == 'true'
         # https://stackoverflow.com/questions/68057744/create-pull-request-with-github-action
         run: |
-         git config --local user.email "action@github.com"
-         git config --local user.name "GitHub Action"
-         
-         # create new branch
-         git branch bump_version
-         git checkout bump_version
-         
-         # Add the changes and commit
-         git add DESCRIPTION
-         
-         git commit -m "Bump version number in DESCRIPTION"
-         
-         git push --set-upstream origin bump_version
+         if $BUMP_VERSION == "true"; then
+           git config --local user.email "action@github.com"
+           git config --local user.name "GitHub Action"
 
-         # Request merge
-         gh pr create -B main -H bump_version --title 'Bump version' --body 'Created by Github action'
-       
+           # create new branch
+           git branch bump_version
+           git checkout bump_version
+
+           # Add the changes and commit
+           git add DESCRIPTION
+
+           git commit -m "Bump version number in DESCRIPTION"
+
+           git push --set-upstream origin bump_version
+
+           # Request merge
+           gh pr create -B main -H bump_version --title 'Bump version' --body 'Created by Github action'
+         fi
+         
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
