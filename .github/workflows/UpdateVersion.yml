@@ -35,15 +35,14 @@ jobs:
       - name: Amend previous commit
         run: |
          # Get the details of the previous commit
-         PREVIOUS_AUTHOR="$(git show -s --format='%an <%ae>' HEAD^)"
-         PREVIOUS_MESSAGE="$(git show -s --format='%B' HEAD^)"
+         git config user.name "$(git log -n 1 --pretty=format:%an)"
+         git config user.email "$(git log -n 1 --pretty=format:%ae)"
 
-         # Set the author and message of the current commit to be the same as the previous commit
-         git commit --amend --no-edit --author="$PREVIOUS_AUTHOR" -m "$PREVIOUS_MESSAGE"
-
-         # Add the changes to the previous commit
+         # Add the changes and commit
          git add DESCRIPTION
+         
+         git commit -m "Bump version number in DESCRIPTION"
 
          # Push the changes to the remote branch
-         git push origin HEAD
+         git push origin main
 
