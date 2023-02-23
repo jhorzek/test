@@ -46,6 +46,8 @@ jobs:
          git add DESCRIPTION
          
          git commit -m "Bump version number in DESCRIPTION"
+         
+         git push bump_version
 
          # Request merge
          gh pr create -B main -H bump_version --title 'Bump version' --body 'Created by Github action'
