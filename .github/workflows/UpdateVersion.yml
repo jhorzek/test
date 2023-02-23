@@ -17,7 +17,7 @@ jobs:
           # https://remarkablemark.org/blog/2022/09/25/check-git-branch-exists-in-remote-repository/
           BRANCH='version_bump'
                   
-          if (git ls-remote --exit-code --heads origin <bump_version>); then
+          if (git ls-remote --exit-code --heads origin bump_version); then
             echo "Branch version_bump already exists. Skipping this job. Please merge the existing branch first."
             
           else
