@@ -1,1 +1,1 @@
-This Package demonstrates how to automatically increase the version number in the DESCRIPTION of an R package using GitHub Actions. It currently creates a pull request.
+This Package demonstrates how to automatically increase the version number in the DESCRIPTION of an R package using GitHub Actions. It currently creates a pull request. It skippes the update if the last commit was a pull request created by the action.
