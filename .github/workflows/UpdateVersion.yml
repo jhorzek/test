@@ -14,22 +14,30 @@ jobs:
 
       - name: Check if branch version_bump already exists
         run: |
-          if git ls-remote --exit-code --heads origin "version_bump"
-          then
+          # https://remarkablemark.org/blog/2022/09/25/check-git-branch-exists-in-remote-repository/
+          BRANCH='version_bump'
+          git ls-remote --exit-code --heads origin $BRANCH >/dev/null 2>&1
+          EXIT_CODE=$?
+        
+          if [[ $EXIT_CODE == '0' ]]; then
             echo "Branch version_bump already exists. Skipping this job. Please merge the existing branch first."
-            export BUMP_VERSION=false
-            echo "::set-env name=BUMP_VERSION::$BUMP_VERSION"
-          else:
-            export BUMP_VERSION=true
-            echo "::set-env name=BUMP_VERSION::$BUMP_VERSION"
+            
+          elif [[ $EXIT_CODE == '2' ]]; then
+            # 2 means that the branch was not found.
+            # We create a text file without content. 
+            # In the subsequent jobs, we can check if this textfile exists
+            touch bump_version.txt
           fi
-          echo $BUMP_VERSION
+          FILE=bump_version.txt
+          if test -f "$FILE"; then
+            echo "$FILE exists."
+          fi
 
       - name: Get current version number
         id: get-version
         run: |
-          echo "$BUMP_VERSION"
-          if $BUMP_VERSION == "true"; then
+          FILE=bump_version.txt
+          if test -f "$FILE"; then
           current_version=$(grep "Version:" DESCRIPTION | sed 's/Version: \([0-9]*\)\.\([0-9]*\)\.\([0-9]*\)/\1.\2.\3/')
           echo "::set-output name=version::$current_version"
           fi
@@ -37,7 +45,8 @@ jobs:
       - name: Increment version number
         id: increment-version
         run: |
-          if $BUMP_VERSION == "true"; then
+          FILE=bump_version.txt
+          if test -f "$FILE"; then
             current_version=${{ steps.get-version.outputs.version }}
             major=$(echo $current_version | cut -d '.' -f 1)
             minor=$(echo $current_version | cut -d '.' -f 2)
@@ -48,14 +57,16 @@ jobs:
 
       - name: Update DESCRIPTION file
         run: |
-         if $BUMP_VERSION == "true"; then
+         FILE=bump_version.txt
+          if test -f "$FILE"; then
           sed -i "s/Version:.*$/Version: ${{ steps.increment-version.outputs.new_version }}/g" DESCRIPTION
          fi
        
       - name: Create pull request
         # https://stackoverflow.com/questions/68057744/create-pull-request-with-github-action
         run: |
-         if $BUMP_VERSION == "true"; then
+         FILE=bump_version.txt
+          if test -f "$FILE"; then
            git config --local user.email "action@github.com"
            git config --local user.name "GitHub Action"
 
