@@ -34,15 +34,18 @@ jobs:
        
       - name: Amend previous commit
         run: |
-         # Get the details of the previous commit
-         git config user.name "$(git log -n 1 --pretty=format:%an)"
-         git config user.email "$(git log -n 1 --pretty=format:%ae)"
-
+         git config --local user.email "action@github.com"
+         git config --local user.name "GitHub Action"
+         
+         # create new branch
+         git branch bump_version
+         git checkout bump_version
+         
          # Add the changes and commit
          git add DESCRIPTION
          
          git commit -m "Bump version number in DESCRIPTION"
 
-         # Push the changes to the remote branch
-         git push origin main
+         # Request merge
+         gh pr create -B main -H bump_version --title 'Bump version' --body 'Created by Github action'
 
