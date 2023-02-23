@@ -5,6 +5,9 @@ on:
     branches:
       - main
 
+env:
+  BUMP_VERSION: true
+
 jobs:
   update-version:
     runs-on: ubuntu-latest
@@ -16,18 +19,20 @@ jobs:
         run: |
           if git ls-remote --heads origin | grep -q "refs/heads/version_bump"; then
             echo "Branch version_bump already exists. Skipping this job. Please merge the existing branch first."
-            exit 1
+            echo "BUMP_VERSION=false" >> $GITHUB_ENV
           fi
-          exit 0
+          BUMP_VERSION
 
       - name: Get current version number
         id: get-version
+        if: env.UPDATE_VERSION == 'true'
         run: |
           current_version=$(grep "Version:" DESCRIPTION | sed 's/Version: \([0-9]*\)\.\([0-9]*\)\.\([0-9]*\)/\1.\2.\3/')
           echo "::set-output name=version::$current_version"
 
       - name: Increment version number
         id: increment-version
+        if: env.UPDATE_VERSION == 'true'
         run: |
           current_version=${{ steps.get-version.outputs.version }}
           major=$(echo $current_version | cut -d '.' -f 1)
@@ -37,10 +42,12 @@ jobs:
           echo "::set-output name=new_version::$new_version"
 
       - name: Update DESCRIPTION file
+        if: env.UPDATE_VERSION == 'true'
         run: |
          sed -i "s/Version:.*$/Version: ${{ steps.increment-version.outputs.new_version }}/g" DESCRIPTION
        
       - name: Create pull request
+        if: env.UPDATE_VERSION == 'true'
         # https://stackoverflow.com/questions/68057744/create-pull-request-with-github-action
         run: |
          git config --local user.email "action@github.com"
